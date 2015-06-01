@@ -8,6 +8,7 @@ Install and setup Neo4j
 Then start Neo4j and start Meteor
 
     neo4j start
+    meteor add ccorcos:neo4j
     meteor
 
 You should be able to see the Neo4j browser at the Neo4j url (default: http://localhost:7474/).
