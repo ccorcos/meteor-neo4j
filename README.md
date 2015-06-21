@@ -58,4 +58,19 @@ Your other option is to instantiate the connection as you normally would, but se
 
 The Neo4j constructor will select the `url` over everything else, so if there are conflicts, it will default to the url you pass. It only runs on `localhost:7474` if it has no other options.
 
+## Querying
+
+Neo4j uses a querying language called `Cypher`, which is pretty similar to SQL. They have a lot of [documentation](http://neo4j.com/docs/stable/cypher-query-lang.html) that is probably worth reviewing. This package uses a very simple implementation of Cypher, which simply passes a string with your query.
+
+    result = Neo4j.query "MATCH (a) RETURN a"
+    
+You can also write multi-line queries, which are generally easier to read:
+
+    result = Neo4j.query """
+               MATCH (a)
+               RETURN a
+               """
+
 ## Examples
+
+*Coming soon!*
