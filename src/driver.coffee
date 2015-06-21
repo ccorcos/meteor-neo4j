@@ -18,8 +18,15 @@ class Neo4jDB
     
     # Check the connection to Neo4j
     # url = 'http://user:password@example.com/' or 'http://localhost:7474'
+
+    @options = {}
+    list = @url.match(/^(.*\/\/)(.*)@(.*$)/)
+    if list
+      @url = list[1] + list[3]
+      @options.auth = list[2]
+
     try
-      response = HTTP.call('GET', @url, {})
+      response = HTTP.call('GET', @url, @options)
       if response.statusCode is 200
         console.info 'Meteor is successfully connected to Neo4j on ' + @url
       else
@@ -59,7 +66,7 @@ class Neo4jDB
   # - multiple different things are returned, like n._id, r._id, `query` returns an array of 2 arrays of those values
   query: (statement, parameters={}) ->
     # response = HTTP.post("http://localhost:7474/db/data/transaction/commit", {data: {statements: [{statement, parameters}]}})
-    response = HTTP.post(@url+"/db/data/transaction/commit", {data: {statements: [{statement, parameters}]}})
+    response = HTTP.post(@url+"/db/data/transaction/commit", R.merge(@options, {data: {statements: [{statement, parameters}]}}))
     throwIfError(response)
     if response.data.results.length is 1
       # one statement should return one result
