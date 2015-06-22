@@ -47,7 +47,7 @@ If you intend to use GrapheneDB, first you must set up an account through their 
 
 Your first option is to pass a url when you instantiate a connection. The format is as follows:
 
-    Neo4j = new Neo4jDB(http://<USERNAME>:<PASSWORD>@projectname.sb05.stations.graphenedb.com:24789)
+    Neo4j = new Neo4jDB("http://<USERNAME>:<PASSWORD>@projectname.sb05.stations.graphenedb.com:24789")
     
 GrapheneDB provides you with the username, password and the url. Your best bet is to put your username and password into a `settings.json` so you don't expose your username and password, but that's your call.
 
