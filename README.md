@@ -67,9 +67,17 @@ If you need to clear the entire database, you have two options: send the proper 
 
 The query to reset your database is:
 
-    MATCH (n) OPTIONAL MATCH (n)-[r]-() RETURN n,r
+    MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r
 
 Or, you can simply call `Neo4j.reset()`, which will make exactly the same call on the server. Both options will result in the same outcome.
+
+## Counting
+
+The fastest way to count how many results are returned from a particular query is to use the method `Neo4j.count()` and pass in your query. For example, to find out how many nodes and edges you have in your database, you could do something like this:
+
+    Neo4j.count("MATCH (n) OPTIONAL MATCH (n)-[r]-() RETURN n,r")
+
+This will return a number that corresponds to the number of nodes and edges in your database.
 
 ## Examples
 
