@@ -25,16 +25,6 @@ When you're done, be sure to stop Neo4j as well, otherwise it will run in the ba
 
 Sometimes it hangs and won't stop. Try `ps aux | grep neo4j` and then `kill -9 <pid>`.
 
-To reset Neo4j, delete `data/graph.db`. If you used brew to install Neo4j, then the path will be similar to the following:
-
-    rm -rf /usr/local/Cellar/neo4j/2.1.7/libexec/data/graph.db
-
-Or you can use the following queries to delete all relationships and all nodes
-
-    match ()-[r]->(), (n) delete r,n
-
-Or you can use the `.reset` method attached to the Neo4j object. This is much slower though.
-
 To instatiate a connection, on the server, use:
 
     Neo4j = new Neo4jDB()
@@ -47,12 +37,12 @@ If you intend to use GrapheneDB, first you must set up an account through their 
 
 Your first option is to pass a url when you instantiate a connection. The format is as follows:
 
-    Neo4j = new Neo4jDB(http://<USERNAME>:<PASSWORD>@projectname.sb05.stations.graphenedb.com:24789)
-    
+    Neo4j = new Neo4jDB("http://<USERNAME>:<PASSWORD>@projectname.sb05.stations.graphenedb.com:24789")
+
 GrapheneDB provides you with the username, password and the url. Your best bet is to put your username and password into a `settings.json` so you don't expose your username and password, but that's your call.
 
 Your other option is to instantiate the connection as you normally would, but set GRAPHENEDB_URL on startup:
-    
+
     Meteor.startup ->
       process.env.GRAPHENEDB_URL = "http://<USERNAME>:<PASSWORD>@projectname.sb05.stations.graphenedb.com:24789"
 
@@ -63,13 +53,23 @@ The Neo4j constructor will select the `url` over everything else, so if there ar
 Neo4j uses a querying language called `Cypher`, which is pretty similar to SQL. They have a lot of [documentation](http://neo4j.com/docs/stable/cypher-query-lang.html) that is probably worth reviewing. This package uses a very simple implementation of Cypher, which simply passes a string with your query.
 
     result = Neo4j.query "MATCH (a) RETURN a"
-    
+
 You can also write multi-line queries, which are generally easier to read:
 
     result = Neo4j.query """
                MATCH (a)
                RETURN a
                """
+
+## Reseting
+
+If you need to clear the entire database, you have two options: send the proper query, or use the `Neo4j.reset()` method.
+
+The query to reset your database is:
+
+    MATCH (n) OPTIONAL MATCH (n)-[r]-() RETURN n,r
+
+Or, you can simply call `Neo4j.reset()`, which will make exactly the same call on the server. Both options will result in the same outcome.
 
 ## Examples
 

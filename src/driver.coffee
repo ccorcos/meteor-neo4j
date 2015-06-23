@@ -15,9 +15,6 @@ transpose = (xy) ->
 class Neo4jDB
   constructor: (url) ->
     @url = url or process.env.NEO4J_URL or process.env.GRAPHENEDB_URL or 'http://localhost:7474'
-    
-    # Check the connection to Neo4j
-    # url = 'http://user:password@example.com/' or 'http://localhost:7474'
 
     @options = {}
     list = @url.match(/^(.*\/\/)(.*)@(.*$)/)
@@ -51,11 +48,11 @@ class Neo4jDB
     else
       "#{value}"
 
-  reset: ->
-    console.log "Resetting Neo4j"
+  reset: () ->
+    console.log "Resetting Neo4j..."
+    @query "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r"
     # clear the database
-    @query "MATCH ()-[r]->(), (n) DELETE r,n"
-    console.log "...done"
+    console.log "...done."
 
   # types of queries:
   # - nothing returned
