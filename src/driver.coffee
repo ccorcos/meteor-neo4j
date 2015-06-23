@@ -48,11 +48,16 @@ class Neo4jDB
     else
       "#{value}"
 
-  reset: () ->
+  reset: ->
     console.log "Resetting Neo4j..."
     @query "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r"
     # clear the database
     console.log "...done."
+
+  count: (statement) ->
+    # flattens the result, rejects null and undefined values, takes the length
+    getCount = R.pipe(R.flatten, R.reject(R.isNil), R.length)
+    return getCount @query(statement)
 
   # types of queries:
   # - nothing returned
