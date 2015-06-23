@@ -8,10 +8,19 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.0');
   api.use([
-    'coffeescript', 
+    'coffeescript',
     'http',
     'ramda:ramda@0.13.0'
   ], 'server');
   api.addFiles('src/driver.coffee', 'server');
-  api.export('Neo4jDB')
+  api.export('Neo4jDB');
+});
+
+Package.onTest(function(api) {
+  api.use('ccorcos:neo4j');
+  api.use('tinytest');
+  api.use('test-helpers');
+
+  // api.add_files('test/helpers.js');
+  api.add_files('test/driver-tests.js', 'server');
 });
