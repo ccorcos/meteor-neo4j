@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var spawn = require('child_process').spawn
+var child_process = require('child_process')
 var fs = require('fs')
 
 var args = process.argv.splice(0,2)
@@ -60,15 +60,18 @@ function setNeo4jPath() {
   fs.writeFileSync(file, result, {encoding:'utf8'})
 }
 
-function startNeo4j() {
-  var child = spawn('neo4j start')
+function exec(name, args) {
+  var child = child_process.spawn(name, args)
   child.stdout.on('data', function (data) {   process.stdout.write(data.toString());  });
   child.stderr.on('data', function (data) {   process.stdout.write(data.toString());  });
-  // child.on('close', function () { } ); });
+}
+
+function startNeo4j() {
+  exec('neo4j', ['start-no-wait'])
 }
 
 function stopNeo4j() {
-  child_process.execSync('neo4j stop')
+  exec('neo4j', ['stop'])
 }
 
 // proc.removeListener('exit', procExitHandler);
