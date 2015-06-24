@@ -1,0 +1,77 @@
+#!/usr/bin/env node
+
+var spawn = require('child_process').spawn
+var fs = require('fs')
+
+var args = process.argv.splice(0,2)
+
+if (args[0] == '--help') 
+  help()
+
+if (args[0] == 'start') 
+  setNeo4jPath()
+  startNeo4j()
+
+if (args[0] == 'stop') 
+  stopNeo4j()
+
+
+var instructions =  "Install Neo4j with Homebrew\n\n" +
+                    "brew install neo4j\n\n" + 
+                    "Export a NEO4J_PATH environment variable. You might want to put in your .bashrc. " + 
+                    "It might look like this:\n\n" + 
+                    "export NEO4J_PATH=/usr/local/Cellar/neo4j/2.1.7"
+
+function help() {
+  console.log(instructions);
+}
+
+function neo4jPath() {
+  // export NEO4J_PATH=/usr/local/Cellar/neo4j/2.1.7
+  var n4j = process.env.NEO4J_PATH
+  if (!n4j)
+    throw new Error("Please create an environment variable, NEO4J_PATH.")
+  if (n4j[n4j.length-1] != '/')
+    n4j += '/'
+  return n4j
+}
+
+function getAppDir() {
+  var dir = process.cwd()
+  var path = dir.split('/')
+  while (path.length > 0) {
+    dir = path.join('/')
+    if (fs.existsSync(dir + '/.meteor/'))
+      return dir + '/'
+    else
+      path.splice(path.length-1,1)
+  }
+
+  throw new Error("Couldn't find a Meteor app on your path.") 
+}
+
+function setNeo4jPath() {
+  // org.neo4j.server.database.location=data/graph.db
+  var dbPath = getAppDir() + '.meteor/local/neo4j/graph.db'
+  var file = neo4jPath() + 'libexec/conf/neo4j-server.properties'
+  var data = fs.readFileSync(file, {encoding:'utf8'})
+  var result = data.replace(/org\.neo4j\.server\.database\.location=.*/, 
+                            'org.neo4j.server.database.location='+dbPath);
+  fs.writeFileSync(file, result, {encoding:'utf8'})
+}
+
+function startNeo4j() {
+  var child = spawn('neo4j start')
+  child.stdout.on('data', function (data) {   process.stdout.write(data.toString());  });
+  child.stderr.on('data', function (data) {   process.stdout.write(data.toString());  });
+  // child.on('close', function () { } ); });
+}
+
+function stopNeo4j() {
+  child_process.execSync('neo4j stop')
+}
+
+// proc.removeListener('exit', procExitHandler);
+// proc.kill('SIGINT');
+// proc = null;
+
