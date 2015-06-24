@@ -1,90 +1,112 @@
 # Meteor Neo4j
 
-This package will allow you to use the open-source graph database Neo4j with your Meteor project. If you are mapping relationships, this database will be much more efficient than the built-in Mongo database. You can run it both locally and with [GrapheneDB](http://www.graphenedb.com/) for production.
+This package allows you to use the open-source graph database Neo4j with your Meteor project.
 
-## Installation and setup
+## Installation and Setup
 
-You will have to install Neo4j globally on your machine. It is also important to note that you must start up Neo4j independently of Meteor every time you want to use it using the command `neo4j start`. Install Neo4j with the following command:
+You will have to install Neo4j on your machine. If you're on a Mac using Homebrew:
 
     brew install neo4j
-    npm install -g neo4j
 
-Then start Neo4j and start Meteor:
+Then add this package to your Meteor project:
+
+    meteor add ccorcos:neo4j
+
+You can get up and running quickly by starting Neo4j, and then starting Meteor:
 
     neo4j start
-    meteor add ccorcos:neo4j
     meteor
 
-## How to use
+Neo4j has a nice browser interface so be sure to check it out! 
+The default URL is http://localhost:7474/
 
-You should be able to see the Neo4j browser at the Neo4j url (default: http://localhost:7474/). Neo4j provides you with a pretty nice user interface to play around with and test out your cypher queries.
-
-When you're done, be sure to stop Neo4j as well, otherwise it will run in the background forever:
+Then, when you're done, make sure you stop Neo4j as well:
 
     neo4j stop
 
-Sometimes it hangs and won't stop. Try `ps aux | grep neo4j` and then `kill -9 <pid>`.
+### CLI
 
-To instatiate a connection, on the server, use:
+I'm working on a command-line tool for this package. 
+Hopefully at some point, Meteor will allow some hooks into the build system.
+The main benefit of this tool is that it creates a Neo4j database in `.meteor/local/neo4j/`
+so that you can separate your projects nicely. First, download the script and make it
+executable.
+
+    curl -O https://raw.githubusercontent.com/ccorcos/meteor-neo4j/master/m4j
+    chmod +x m4j
+
+Make sure this script is somewhere on your path. Then from inside your Meteor project, 
+you can start Neo4j and it will create a database for this project if it doesn't already exist.
+
+    m4j start
+
+Then feel free to start up Meteor. And when you're done, you can stop using:
+
+    m4j stop
+
+Finally, when you use `meteor reset`, it will also clear the Neo4j database because `meteor reset`
+clears the project's `.meteor/local/` directory. 
+Just **make sure you stop Neo4j before resetting meteor**.
+
+
+## API
+
+On the server, start the database connection:
 
     Neo4j = new Neo4jDB()
 
-Also note, that Neo4j does not accept nested property lists, so its best to structure your Mongo collections similarly.
+This defaults to running on `http://localhost:7474/`. 
+If you want to connect to a Neo4j instance running elsewhere, 
+you can pass a url string with authentication:
 
-If you intend to use GrapheneDB, first you must set up an account through their website and obtain your url, username, and password. Then, you have two options for initializing GrapheneDB: passing a url or setting the GRAPHENEDB_URL environment variable. We will go over both options.
+    Neo4j = new Neo4jDB("http://username:password@project.graphenedb.com:24789")
 
-## Connecting with GrapheneDB
+You can also set the an environment variable for `NEO4J_URL` or `GRAPHENEDB_URL`.
 
-Your first option is to pass a url when you instantiate a connection. The format is as follows:
+Neo4j uses a querying language called [Cypher](http://neo4j.com/docs/stable/cypher-query-lang.html).
+You can run a query like this:
 
-    Neo4j = new Neo4jDB("http://<USERNAME>:<PASSWORD>@projectname.sb05.stations.graphenedb.com:24789")
+    result = Neo4j.query("MATCH (a) RETURN a")
 
-GrapheneDB provides you with the username, password and the url. Your best bet is to put your username and password into a `settings.json` so you don't expose your username and password, but that's your call.
-
-Your other option is to instantiate the connection as you normally would, but set GRAPHENEDB_URL on startup:
-
-    Meteor.startup ->
-      process.env.GRAPHENEDB_URL = "http://<USERNAME>:<PASSWORD>@projectname.sb05.stations.graphenedb.com:24789"
-
-The Neo4j constructor will select the `url` over everything else, so if there are conflicts, it will default to the url you pass. It only runs on `localhost:7474` if it has no other options.
-
-## Querying
-
-Neo4j uses a querying language called `Cypher`, which is pretty similar to SQL. They have a lot of [documentation](http://neo4j.com/docs/stable/cypher-query-lang.html) that is probably worth reviewing. This package uses a very simple implementation of Cypher, which simply passes a string with your query.
-
-    result = Neo4j.query "MATCH (a) RETURN a"
-
-You can also write multi-line queries, which are generally easier to read:
+I like to write multi-line queries in Coffeescript, which are generally easier to read:
 
     result = Neo4j.query """
-               MATCH (a)
-               RETURN a
-               """
+                         MATCH (n)
+                         RETURN n
+                         """
 
-## Reseting
+Neo4j has an interesting way of returning results and I've come up with a reasonable
+way of interpreting them.
 
-If you need to clear the entire database, you have two options: send the proper query, or use the `Neo4j.reset()` method.
+- If there are no items to be returned, `query` returns undefined.
+- If you query for an array of values, you'll get just that. e.g `MATCH (n) RETURN n`
+- If you query for a property, you'll get an array as well. e.g.  `MATCH (n) RETURN n.name`
+- If you query multiple properties, you'll get a 2D array. e.g. `MATCH (n) RETURN n.name, n.email`
 
-The query to reset your database is:
+Neo4j queries don't play will with `JSON.stringify` for a variety of reasons.
+For that reason, use `Neo4j.stringify`. e.g. 
 
-    MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r
+    Neo4j.query "CREATE (:PERSON #{Neo4j.stringify(user)})"
 
-Or, you can simply call `Neo4j.reset()`, which will make exactly the same call on the server. Both options will result in the same outcome.
+You can clear the database at the commandline:
 
-## Counting
+    neo4j stop
+    meteor reset
 
-The fastest way to count how many results are returned from a particular query is to use the method `Neo4j.count()` and pass in your query. For example, to find out how many nodes and edges you have in your database, you could do something like this:
+Or you can clear it in Node:
 
-    Neo4j.count("MATCH (n) OPTIONAL MATCH (n)-[r]-() RETURN n,r")
+    Neo4j.reset()
 
-This will return a number that corresponds to the number of nodes and edges in your database.
+You can also check to see if the database is empty using:
 
-## Examples
+    Neo4j.isEmpty()
 
-*Coming soon!*
+## Deploy
 
-## To Do
+There are several hosting solution for Neo4j. 
+[GrapheneDB](http://www.graphenedb.com/) is popular.
 
-- neo4j commandline
-- refactor docs
-- example app
+## Quirks
+
+- Sometimes Neo4j hangs and won't stop. Try `ps aux | grep neo4j` and then `kill -9 <pid>`.
+- Neo4j does not accept nested property lists!
