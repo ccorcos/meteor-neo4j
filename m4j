@@ -3,24 +3,11 @@
 var child_process = require('child_process')
 var fs = require('fs')
 
-var args = process.argv.splice(0,2)
-
-if (args[0] == '--help') 
-  help()
-
-if (args[0] == 'start') 
-  setNeo4jPath()
-  startNeo4j()
-
-if (args[0] == 'stop') 
-  stopNeo4j()
-
-
 var instructions =  "Install Neo4j with Homebrew\n\n" +
                     "brew install neo4j\n\n" + 
                     "Export a NEO4J_PATH environment variable. You might want to put in your .bashrc. " + 
                     "It might look like this:\n\n" + 
-                    "export NEO4J_PATH=/usr/local/Cellar/neo4j/2.1.7"
+                    "export NEO4J_PATH=/usr/local/Cellar/neo4j/2.1.7";
 
 function help() {
   console.log(instructions);
@@ -74,7 +61,19 @@ function stopNeo4j() {
   exec('neo4j', ['stop'])
 }
 
-// proc.removeListener('exit', procExitHandler);
-// proc.kill('SIGINT');
-// proc = null;
+var args = process.argv
+args.splice(0,2)
 
+if (args[0] == '--help') {
+  help()
+}
+
+if (args[0] == 'start') {
+  stopNeo4j()
+  setNeo4jPath()
+  startNeo4j()
+}
+
+if (args[0] == 'stop') {
+  stopNeo4j()
+}
