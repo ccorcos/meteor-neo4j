@@ -1,0 +1,12 @@
+<body>
+  {{>main}}
+</body>
+
+<template name="main">
+  The most popular person is {{person.name}} and his friends are:
+  <ul>
+    {{#each friends}}
+      <li>{{name}}</li>
+    {{/each}}
+  </ul>
+</template>

@@ -54,10 +54,9 @@ class Neo4jDB
     # clear the database
     console.log "...done."
 
-  count: (statement) ->
-    # flattens the result, rejects null and undefined values, takes the length
-    getCount = R.pipe(R.flatten, R.reject(R.isNil), R.length)
-    return getCount @query(statement)
+  isEmpty: ->
+    [n] = Neo4j.query("MATCH (n) MATCH (n)-[r]-() RETURN count(n)+count(r)")
+    return (n is 0)
 
   # types of queries:
   # - nothing returned

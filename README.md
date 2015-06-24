@@ -82,3 +82,9 @@ This will return a number that corresponds to the number of nodes and edges in y
 ## Examples
 
 *Coming soon!*
+
+## To Do
+
+- neo4j commandline
+- refactor docs
+- example app
