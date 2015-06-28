@@ -35,8 +35,14 @@ executable.
     curl -O https://raw.githubusercontent.com/ccorcos/meteor-neo4j/master/m4j
     chmod +x m4j
 
-Make sure this script is somewhere on your path. Then from inside your Meteor project, 
-you can start Neo4j and it will create a database for this project if it doesn't already exist.
+Make sure this script is somewhere on your path. You'll also need to export a `NEO4J_PATH`
+environment variable so the script can find Neo4j. If you installed Neo4j with `brew`, 
+you'll do something like this (you probably want to add this to your `~/.bashrc`).
+
+    export NEO4J_PATH=/usr/local/Cellar/neo4j/2.1.7
+
+Then from inside your Meteor project, you can start Neo4j and it will create a database 
+for this project if it doesn't already exist.
 
     m4j start
 
