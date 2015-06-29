@@ -69,7 +69,6 @@ if (args[0] == '--help') {
 }
 
 if (args[0] == 'start') {
-  stopNeo4j()
   setNeo4jPath()
   startNeo4j()
 }
