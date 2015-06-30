@@ -1,6 +1,6 @@
 # Meteor Neo4j
 
-This package allows you to use the open-source graph database Neo4j with your Meteor project.
+This package allows you to use the open-source graph database Neo4j with your Meteor project. You can use this package by itself or in tandem with [`ccorcos:any-db`](https://github.com/ccorcos/meteor-any-db).
 
 ## Installation and Setup
 
