@@ -12,6 +12,24 @@ transpose = (xy) ->
   # get the index, pull the nth item, pass that function to map
   R.mapIndexed(R.pipe(R.nthArg(1), R.nth, R.map(R.__, xy)), R.head(xy))
 
+
+stringify = (value) ->
+  # turn an object into a string that plays well with
+  # Cipher queries.
+  if isArray(value)
+    value.map(stringify).toString()
+  else if isPlainObject(value)
+    pairs = []
+    for k,v of value
+      pairs.push "#{k}:#{stringify(v)}"
+    "{" + pairs.join(', ') + "}"
+  else if isString(value)
+    "'#{value.replace(/'/g, "\\'")}'"
+  else if value is undefined
+    null
+  else
+    "#{value}"
+
 class Neo4jDB
   constructor: (url) ->
     @url = url or process.env.NEO4J_URL or process.env.GRAPHENEDB_URL or 'http://localhost:7474'
@@ -31,22 +49,7 @@ class Neo4jDB
     catch error
       console.warn 'HTTP Error trying to connect to Neo4j', error.toString()
 
-  stringify: (value) ->
-    # turn an object into a string that plays well with
-    # Cipher queries.
-    if _.isArray(value)
-      value.map(@stringify).toString()
-    else if _.isObject(value)
-      pairs = []
-      for k,v of value
-        pairs.push "#{k}:#{@stringify(v)}"
-      "{" + pairs.join(', ') + "}"
-    else if _.isString(value)
-      "'#{value.replace(/'/g, "\\'")}'"
-    else if value is undefined
-      null
-    else
-      "#{value}"
+  @stringify: stringify
 
   reset: ->
     console.log "Resetting Neo4j..."
