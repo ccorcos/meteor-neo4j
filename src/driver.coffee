@@ -17,7 +17,7 @@ stringify = (value) ->
   # turn an object into a string that plays well with
   # Cipher queries.
   if isArray(value)
-    value.map(stringify).toString()
+    "[#{value.map(stringify).join(',')}]"
   else if isPlainObject(value)
     pairs = []
     for k,v of value
@@ -29,6 +29,9 @@ stringify = (value) ->
     null
   else
     "#{value}"
+
+regexify = (string) ->
+  "'(?i).*#{string.replace(/'/g, "\\'").replace(/\//g, '\/')}.*'"
 
 class Neo4jDB
   constructor: (url) ->
@@ -50,6 +53,7 @@ class Neo4jDB
       console.warn 'HTTP Error trying to connect to Neo4j', error.toString()
 
   @stringify: stringify
+  @regexify: regexify
 
   reset: ->
     console.log "Resetting Neo4j..."

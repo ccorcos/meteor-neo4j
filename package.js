@@ -1,7 +1,7 @@
 Package.describe({
   name: 'ccorcos:neo4j',
   summary: 'Neo4j API for Meteor',
-  version: '0.0.5',
+  version: '0.0.6',
   git: 'https://github.com/ccorcos/meteor-neo4j'
 });
 
