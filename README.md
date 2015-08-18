@@ -90,9 +90,15 @@ way of interpreting them.
 - If you query multiple properties, you'll get a 2D array. e.g. `MATCH (n) RETURN n.name, n.email`
 
 Neo4j queries don't play will with `JSON.stringify` for a variety of reasons.
-For that reason, use `Neo4j.stringify`. e.g. 
+For that reason, use `Neo4jDB.stringify`. e.g. 
 
-    Neo4j.query "CREATE (:PERSON #{Neo4j.stringify(user)})"
+    str = Neo4jDB.stringify
+    Neo4j.query "CREATE (p:PERSON #{str(user)}) RETURN p"
+
+Also, if you want to do a regex search, use `Neo4jDB.regexify`.
+
+    regex = Neo4jDB.regexify
+    Neo4j.query "CREATE (p:PERSON) WHERE p.name =~ #{regex(query)} RETURN p"
 
 You can clear the database at the commandline:
 
