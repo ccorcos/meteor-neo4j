@@ -12,6 +12,25 @@ transpose = (xy) ->
   # get the index, pull the nth item, pass that function to map
   R.mapIndexed(R.pipe(R.nthArg(1), R.nth, R.map(R.__, xy)), R.head(xy))
 
+isArray = (x) ->
+  Object.prototype.toString.apply(x) is '[object Array]'
+
+isPlainObject = (x) ->
+  Object.prototype.toString.apply(x) is '[object Object]'
+
+isString = (x) ->
+  Object.prototype.toString.apply(x) is '[object String]'
+
+rows2fields = (rows, keys) ->
+  rows.map (row) ->
+    unless isArray(row)
+      row = [row]
+    if row.length isnt keys.length
+      console.warn "Wrong number of fields specified for the row", row, keys
+    obj = {}
+    for i in [0...row.length]
+      obj[keys[i]] = row[i]
+    return obj
 
 stringify = (value) ->
   # turn an object into a string that plays well with
@@ -44,6 +63,7 @@ class Neo4jDB
       @options.auth = list[2]
 
     try
+      console.info 'Connecting to Neo4j on ' + @url
       response = HTTP.call('GET', @url, @options)
       if response.statusCode is 200
         console.info 'Meteor is successfully connected to Neo4j on ' + @url
@@ -53,7 +73,19 @@ class Neo4jDB
       console.warn 'HTTP Error trying to connect to Neo4j', error.toString()
 
   @stringify: stringify
+  stringify: stringify
   @regexify: regexify
+  regexify: regexify
+  @transpose: transpose
+  transpose: transpose
+  @rows2fields: rows2fields
+  rows2fields: rows2fields
+
+  latency: ->
+    R.mean [0...10].map => 
+      start = Date.now()
+      HTTP.call('GET', @url, @options)
+      Date.now() - start
 
   reset: ->
     console.log "Resetting Neo4j..."
@@ -91,8 +123,7 @@ class Neo4jDB
           return [0...result.columns.length].map(->[])
         else
           # if there are multiple columns, return a collection for each one
-          getResults = R.compose(transpose, getValues)
-          return getResults(result.data)
+          return getValues(result.data)
 
   # zip(keys, columns) -> [{key:val}, ...]
   # turns a matrix of columns into rows with key values.
