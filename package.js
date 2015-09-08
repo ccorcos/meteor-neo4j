@@ -1,7 +1,7 @@
 Package.describe({
   name: 'ccorcos:neo4j',
   summary: 'Neo4j API for Meteor',
-  version: '0.0.7',
+  version: '0.1.0',
   git: 'https://github.com/ccorcos/meteor-neo4j'
 });
 
@@ -10,17 +10,8 @@ Package.onUse(function(api) {
   api.use([
     'coffeescript',
     'http',
-    'ramda:ramda@0.14.0'
+    'ramda:ramda@0.17.1'
   ], 'server');
-  api.addFiles('src/driver.coffee', 'server');
-  api.export('Neo4jDB');
-});
-
-Package.onTest(function(api) {
-  api.use('ccorcos:neo4j');
-  api.use('tinytest');
-  api.use('test-helpers');
-
-  // api.add_files('test/helpers.js');
-  api.add_files('test/driver-tests.js', 'server');
+  api.addFiles(['neo4j.coffee', 'globals.js'], 'server');
+  api.export(['Neo4jDB', 'Neo4j'], 'server');
 });
