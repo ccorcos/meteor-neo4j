@@ -2,6 +2,8 @@
 
 This package allows you to connect and query Neo4j from Meteor.
 
+[Check out this article](https://medium.com/p/17b0fce644d/).
+
 ## Installation (Mac)
 
 ```
