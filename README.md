@@ -11,6 +11,8 @@ brew install neo4j
 meteor add ccorcos:neo4j
 # start neo4j
 neo4j start
+# start meteor
+meteor
 # stop neo4j
 neo4j stop
 ```

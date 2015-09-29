@@ -1,24 +1,14 @@
-# To do
-# - Meteor.settings.neo4j_url
-# - Meteor.env.NEO4J_URL
-
-isArray = (x) ->
-  Object.prototype.toString.apply(x) is '[object Array]'
-isPlainObject = (x) ->
-  Object.prototype.toString.apply(x) is '[object Object]'
-isString = (x) ->
-  Object.prototype.toString.apply(x) is '[object String]'
 
 stringify = (value) ->
   # turn an object into a string that plays well with Cipher queries.
-  if isArray(value)
+  if _.isArray(value)
     "[#{value.map(stringify).join(',')}]"
-  else if isPlainObject(value)
+  else if U.isPlainObject(value)
     pairs = []
     for k,v of value
       pairs.push "#{k}:#{stringify(v)}"
     "{" + pairs.join(', ') + "}"
-  else if isString(value)
+  else if _.isString(value)
     "'#{value.replace(/'/g, "\\'")}'"
   else if value is undefined
     null
