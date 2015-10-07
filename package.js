@@ -7,11 +7,13 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.versionsFrom('1.2');
-  api.use([
+  var packages = [
     'coffeescript',
     'http',
-    'ccorcos:utils@0.0.1'
-  ], 'server');
+    'ccorcos:utils@0.0.2'
+  ]
+  api.use(packages);
+  api.imply(packages);
   api.addFiles(['neo4j.coffee', 'globals.js'], 'server');
   api.export(['Neo4jDB', 'Neo4j'], 'server');
 });
