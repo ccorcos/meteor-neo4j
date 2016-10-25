@@ -1,6 +1,6 @@
 [![Meteor Icon](http://icon.meteor.com/package/ccorcos:neo4j)](https://atmospherejs.com/ccorcos/neo4j)
 
-# Meteor Neo4j
+# Meteor Neo4j [MAINTAINER WANTED]
 
 This package allows you to connect and query Neo4j from Meteor.
 
